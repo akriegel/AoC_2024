@@ -10,6 +10,7 @@
 
 using namespace std;
 using Ints = list<int>;
+using IntsRef = list<int>&;
 using TupInts = tuple<Ints, Ints>;
 
 // Initialize a tuple containing two empty lists of ints
@@ -32,8 +33,8 @@ int find_ind(int n, Ints xs) {
 
 // Insert two ints into a TupInts such that the lists are sorted
 TupInts tups_insert(TupInts tups, int n, int m) {
-    Ints& list0 = get<0>(tups);
-    Ints& list1 = get<1>(tups);
+    IntsRef list0 = get<0>(tups);
+    IntsRef list1 = get<1>(tups);
     int i = find_ind(n, list0);
     int j = find_ind(m, list1);
     list0.insert(next(list0.begin(), i), n);
@@ -42,8 +43,8 @@ TupInts tups_insert(TupInts tups, int n, int m) {
 }
 
 int count_diffs(TupInts tups) {
-    Ints& list0 = get<0>(tups);
-    Ints& list1 = get<1>(tups);
+    IntsRef list0 = get<0>(tups);
+    IntsRef list1 = get<1>(tups);
     auto idx0 = list0.begin();
     auto idx1 = list1.begin();
     int result = 0;
@@ -51,6 +52,33 @@ int count_diffs(TupInts tups) {
         result += abs(*idx0 - *idx1);
         idx0 = next(idx0);
         idx1 = next(idx1);
+    }
+    return result;
+}
+
+int similarity_score(TupInts tups) {
+    IntsRef list0 = get<0>(tups);
+    IntsRef list1 = get<1>(tups);
+    auto idx0 = list0.begin();
+    auto idx1 = list1.begin();
+    int n, ns, ms;
+    int result = 0;
+    while(idx0 != list0.end()) {
+        n = *idx0;
+        ms = 0;
+        while(idx1 != list1.end() && *idx1 < n) {
+            idx1 = next(idx1);
+        }
+        while(idx1 != list1.end() && *idx1 == n) {
+            ms++;
+            idx1 = next(idx1);
+        }
+        ns = 0;
+        while (*idx0 == n) {
+            ns++;
+            idx0 = next(idx0);
+        }
+        result += (n * ns * ms);
     }
     return result;
 }
@@ -67,8 +95,10 @@ int main() {
         tups = tups_insert(tups, n, m);
     }
 
-    int result = count_diffs(tups);
-    printf("Difference = %d\n", result);
+    int diff = count_diffs(tups);
+    int sim = similarity_score(tups);
+
+    printf("Difference = %d\nSimilarity = %d\n", diff, sim);
     file.close();
 
     return 0;

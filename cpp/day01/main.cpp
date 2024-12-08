@@ -74,7 +74,7 @@ int similarity_score(TupInts tups) {
             idx1 = next(idx1);
         }
         ns = 0;
-        while (*idx0 == n) {
+        while (idx0 != list0.end() && *idx0 == n) {
             ns++;
             idx0 = next(idx0);
         }
